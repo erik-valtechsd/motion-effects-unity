@@ -9,6 +9,7 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Mm]emoryCaptures/
+/Assets/[Mm]odels/[Ff]irebase/[Pp]lugins/
 /Assets/[Mm]odels
 /Assets/[Ii]mages
 /Assets/[Ii]mages
@@ -19,6 +20,9 @@
 # Visual Studio cache directory
 .vs/
 
+*.so
+
+
 # Gradle cache directory
 .gradle/
 
@@ -27,7 +31,10 @@ ExportedObj/
 .consulo/
 *.csproj
 *.unityproj
+*.unitypackage
 *.sln
+*.so
+*.dll
 *.suo
 *.tmp
 *.user
