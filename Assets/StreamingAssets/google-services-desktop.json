@@ -1,0 +1,36 @@
+{
+  "project_info": {
+    "project_number": "534660787892",
+    "project_id": "remote-immersive",
+    "storage_bucket": "remote-immersive.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:534660787892:ios:c1a0815bbfa9b9a7fbb1e1",
+        "android_client_info": {
+          "package_name": "com.company.remote-immersive"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "534660787892-b088h3b2cg2pfl6nbjvi8t4n9ecru96c.apps.googleusercontent.com"
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARxf9JREvBeQTzXm_Vik6EqFiCYGUjUYc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 0
+        },
+        "appinvite_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

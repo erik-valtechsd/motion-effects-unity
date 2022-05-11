@@ -6,138 +6,179 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.VFX;
-using UnityEditor.VFX;
-using UnityEditor.VFX.UI;
+// using UnityEditor.VFX;
+// using UnityEditor.VFX.UI;
 
 
 namespace extOSC.Examples
 {
-	public class OscController : MonoBehaviour
-	{
-		 float x,y,z = 0;
-		 float accel = 0;
+
+    public class OscController : MonoBehaviour
+    {
+        public float x, y, z = 0;
+        float accel = 0;
         GameObject controlledObject;
-            float smooth = 5.0f;
+        float smooth = 5.0f;
 
 
-    Gradient gradient;
-    GradientColorKey[] colorKey;
-    GradientAlphaKey[] alphaKey;
+        Gradient gradient;
+        GradientColorKey[] colorKey;
+        GradientAlphaKey[] alphaKey;
 
-	//rigidbody for physics based motion of gameobject
-    // Rigidbody m_Rigidbody;
-	[SerializeField]
-    [Range(1,50)]
-    float m_Speed;
+        //rigidbody for physics based motion of gameobject
+        // Rigidbody m_Rigidbody;
 
-	[SerializeField]
-	GameObject dummyRotation;
+        //get reference to the realtime firebase db script
+        [SerializeField]
+        RTdatabase rtData;
+        [SerializeField]
+        [Range(1, 50)]
+        float m_Speed;
 
-    private VisualEffect visualEffect;
-    float exposedParameter;
+        [SerializeField]
+        GameObject dummyRotation;
 
-		#region Private Vars
+        private VisualEffect visualEffect;
+        float exposedParameter;
+
+        #region Private Vars
 
 
-		private OSCReceiver _receiver;
+        private OSCReceiver _receiver;
 
-		private const string _address = "/*"; // Also, you cam use mask in address: /example/*/
+        private const string _address = "/*"; // Also, you cam use mask in address: /example/*/
 
-		#endregion
+        #endregion
 
-		#region Unity Methods
+        #region Unity Methods
 
-		protected virtual void Start()
-		{
+        protected virtual void Start()
+        {
             controlledObject = gameObject;
-	
-
-			// Creating a receiver.
-			_receiver = gameObject.AddComponent<OSCReceiver>();
-
-			// Set local port.
-			_receiver.LocalPort = 7001;
-
-			// Bind "MessageReceived" method to special address.
-			_receiver.Bind(_address, MessageReceived);
-
-			visualEffect = this.transform.GetComponent<UnityEngine.VFX.VisualEffect>();
-
-		//setup gradient
-        gradient = new Gradient();
-
-        // Populate the color keys at the relative time 0 and 1 (0 and 100%)
-        colorKey = new GradientColorKey[2];
-        colorKey[0].color = Color.red;
-        colorKey[0].time = 0.0f;
-        colorKey[1].color = Color.blue;
-        colorKey[1].time = 1.0f;
-
-        // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
-        alphaKey = new GradientAlphaKey[2];
-        alphaKey[0].alpha = 1.0f;
-        alphaKey[0].time = 0.0f;
-        alphaKey[1].alpha = 0.0f;
-        alphaKey[1].time = 1.0f;
-
-        gradient.SetKeys(colorKey, alphaKey);
-		visualEffect.SetGradient("gradient1", gradient);
-
-		//setup rigidbody
-        // m_Rigidbody = transform.GetComponent<Rigidbody>();
 
 
-		}
+            // Creating a receiver.
+            _receiver = gameObject.AddComponent<OSCReceiver>();
 
-		protected virtual void Update()
-		{
-			// Remap(x,)
-					SetGradientColor(x,y,z);
-		visualEffect.SetVector3("position", dummyRotation.transform.forward * m_Speed);
+            // Set local port.
+            _receiver.LocalPort = 7001;
 
-		}
+            // Bind "MessageReceived" method to special address.
+            _receiver.Bind(_address, MessageReceived);
 
-		#endregion
+            visualEffect = this.transform.GetComponent<UnityEngine.VFX.VisualEffect>();
 
-		#region Protected Methods
+            //setup gradient
+            gradient = new Gradient();
 
-		protected void MessageReceived(OSCMessage message)
-		{
-			
-			if(message.Address == "/gyrosc/gyro"){
-             x = message.Values[0].FloatValue * Mathf.Rad2Deg;
-             y = message.Values[1].FloatValue * Mathf.Rad2Deg;
-             z = message.Values[2].FloatValue * Mathf.Rad2Deg;
-                    Quaternion target = Quaternion.Euler(x, y, z);
-					Quaternion direction = Quaternion.Slerp(transform.rotation, target,  Time.deltaTime * smooth);
-                    dummyRotation.transform.rotation = target; // set dummy rotation to keep track of forward direction using vector3.forward
-					visualEffect.SetVector3("rotation", new Vector3(x,y,z));
-					}else if(message.Address == "/gyrosc/accel"){
-						accel = message.Values[0].FloatValue;
-					}
-		}
+            // Populate the color keys at the relative time 0 and 1 (0 and 100%)
+            colorKey = new GradientColorKey[2];
+            colorKey[0].color = Color.red;
+            colorKey[0].time = 0.0f;
+            colorKey[1].color = Color.blue;
+            colorKey[1].time = 1.0f;
 
-		protected void SetGradientColor(float r, float g, float b){
-		Color c = new Color(ExtensionMethods.Remap(r, -90, 90, 0,255),ExtensionMethods.Remap(g, -90, 90, 0,255),ExtensionMethods.Remap(b, -90, 90, 0,255));
-		colorKey[0].color = c;
-		alphaKey[0].alpha = ExtensionMethods.Remap(accel, 0, 3, (float)0.2,1);
-		gradient.SetKeys(colorKey, alphaKey);
-		visualEffect.SetGradient("gradient1", gradient);
-		visualEffect.SetVector3("particleColor", new Vector3(c.r,c.g,c.b));
-		// visualEffect.SetFloat("size", ExtensionMethods.Remap(accel, 0, 1, (float)0.2,1));
-		// visualEffect.SetVector3("getRotation", transform.forward * m_Speed;);
-	}
+            // Populate the alpha  keys at relative time 0 and 1  (0 and 100%)
+            alphaKey = new GradientAlphaKey[2];
+            alphaKey[0].alpha = 1.0f;
+            alphaKey[0].time = 0.0f;
+            alphaKey[1].alpha = 0.0f;
+            alphaKey[1].time = 1.0f;
+
+            gradient.SetKeys(colorKey, alphaKey);
+            visualEffect.SetGradient("gradient1", gradient);
+
+            //setup rigidbody
+            // m_Rigidbody = transform.GetComponent<Rigidbody>();
 
 
-		#endregion
-	}
-public static class ExtensionMethods {
- 
-public static float Remap (this float value, float from1, float to1, float from2, float to2) {
-    return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
-}
-   
-}
+        }
+
+        public void SetX(float xVal)
+        {
+            x = xVal; // ExtensionMethods.Remap(xVal, 0, 360, -Mathf.PI, Mathf.PI) * Mathf.Rad2Deg;
+            Quaternion target = Quaternion.Euler(x, y, z);
+            Quaternion direction = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
+            dummyRotation.transform.rotation = target; // set dummy rotation to keep track of forward direction using vector3.forward
+            visualEffect.SetVector3("rotation", new Vector3(x, y, z));
+
+        }
+
+        public void SetY(float yVal)
+        {
+            y = yVal; //  ExtensionMethods.Remap(yVal, 0, 360, -Mathf.PI, Mathf.PI) * Mathf.Rad2Deg;
+            Quaternion target = Quaternion.Euler(x, y, z);
+            Quaternion direction = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
+            dummyRotation.transform.rotation = target; // set dummy rotation to keep track of forward direction using vector3.forward
+            visualEffect.SetVector3("rotation", new Vector3(x, y, z));
+
+        }
+
+        public void SetZ(float zVal)
+        {
+            z = zVal; // ExtensionMethods.Remap(zVal, 0, 360, -Mathf.PI, Mathf.PI) * Mathf.Rad2Deg;
+            Quaternion target = Quaternion.Euler(x, y, z);
+            Quaternion direction = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
+            dummyRotation.transform.rotation = target; // set dummy rotation to keep track of forward direction using vector3.forward
+            visualEffect.SetVector3("rotation", new Vector3(x, y, z));
+
+        }
+
+        protected virtual void Update()
+        {
+            // Remap(x,)
+            SetGradientColor(x, y, z);
+            visualEffect.SetVector3("position", dummyRotation.transform.forward * m_Speed);
+
+        }
+
+        #endregion
+
+        #region Protected Methods
+
+        protected void MessageReceived(OSCMessage message)
+        {
+
+            if (message.Address == "/gyrosc/gyro")
+            {
+                x = message.Values[0].FloatValue * Mathf.Rad2Deg;
+                y = message.Values[1].FloatValue * Mathf.Rad2Deg;
+                z = message.Values[2].FloatValue * Mathf.Rad2Deg;
+                Quaternion target = Quaternion.Euler(x, y, z);
+                Quaternion direction = Quaternion.Slerp(transform.rotation, target, Time.deltaTime * smooth);
+                dummyRotation.transform.rotation = target; // set dummy rotation to keep track of forward direction using vector3.forward
+                visualEffect.SetVector3("rotation", new Vector3(x, y, z));
+            }
+            else if (message.Address == "/gyrosc/accel")
+            {
+                accel = message.Values[0].FloatValue;
+            }
+        }
+
+        protected void SetGradientColor(float r, float g, float b)
+        {
+            Color c = new Color(ExtensionMethods.Remap(r, -90, 90, 0, 255), ExtensionMethods.Remap(g, -90, 90, 0, 255), ExtensionMethods.Remap(b, -90, 90, 0, 255));
+            colorKey[0].color = c;
+            alphaKey[0].alpha = ExtensionMethods.Remap(accel, 0, 3, (float)0.2, 1);
+            gradient.SetKeys(colorKey, alphaKey);
+            visualEffect.SetGradient("gradient1", gradient);
+            visualEffect.SetVector3("particleColor", new Vector3(c.r, c.g, c.b));
+            // visualEffect.SetFloat("size", ExtensionMethods.Remap(accel, 0, 1, (float)0.2,1));
+            // visualEffect.SetVector3("getRotation", transform.forward * m_Speed;);
+        }
+
+
+        #endregion
+    }
+    public static class ExtensionMethods
+    {
+
+        public static float Remap(this float value, float from1, float to1, float from2, float to2)
+        {
+            return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+        }
+
+    }
 
 }
 
