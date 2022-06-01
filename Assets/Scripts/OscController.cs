@@ -124,6 +124,11 @@ namespace extOSC.Examples
 
         }
 
+        public void SetFromDummy()
+        {
+            visualEffect.SetVector3("rotation", dummyRotation.transform.eulerAngles);
+        }
+
         protected virtual void Update()
         {
             // Remap(x,)

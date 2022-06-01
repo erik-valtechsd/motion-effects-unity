@@ -11,6 +11,11 @@ public class DisplayManager : MonoBehaviour
     OscController oscCtrl;
 
     [SerializeField]
+    public bool getRotationFromDummyMode;
+
+    [SerializeField]
+    public GameObject uiScanToStart;
+    [SerializeField]
     public GameObject vfxInstance;
 
     [SerializeField]
@@ -32,10 +37,15 @@ public class DisplayManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(getRotationFromDummyMode){
+            oscCtrl.SetFromDummy();
+        }
         targetTime -= Time.deltaTime;
         if (targetTime <= 0.0f)
         {
             idleMode = true;
+            uiScanToStart.SetActive(true);
+
         }
 
         if (idleMode)
@@ -54,6 +64,8 @@ public class DisplayManager : MonoBehaviour
     {
         idleMode = false;
         targetTime = defaultTargetTime;
+                    uiScanToStart.SetActive(false);
+
     }
 
 }
